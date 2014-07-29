@@ -13,7 +13,7 @@ clear all; close all; clc;
 
 % barbara image located at ./img/barbara.png
 % house image located at ./img/textures/1.4.05.tiff
-X = imread('besovTNV/img/textures/1.4.05.tiff');
+X = imread('../GraphSgmtn/img/textures/1.4.05.tiff');
 namestr = 'house.tiff';
 Xgray = double(X)/255; % convert to (0,1) scale.
 
@@ -83,12 +83,14 @@ Ndecomp = nc*nr-1; % number of decompositions to perform
 Cmat = zeros(Ndecomp+1, length(C)); % store wavelet coefficients of u
 Cmat(1, :) = C; % == f
 Cmat(2,:) = besovROF(Cmat(1,:), 1./lambda);
+
 v = Cmat(1,:);
 for j = 2:Ndecomp
     lambda = 2*lambda;
     v = v - Cmat(j,:);
     Cmat(j+1,:) = besovROF(v, 1./lambda);
 end
+
 figure;
 set(gcf, 'color','w');
 for j = 1:(Ndecomp+1)

@@ -25,7 +25,7 @@ B_{-1}_\infty(L^\infty) norms for various components of the
 decomposition(s). 
 
 The remainder of the files in this project are "helper" files that
-either aid in the function of the GUI [all `update\*.m` files,
+either aid in the function of the GUI [all `update*.m` files,
 `distinguishable_colors.m`, getImage.m], or the computation of the
 image decompositions [`besovROF.m`], or both [`decompTNV.m`,
 `imageTNV.m`].
