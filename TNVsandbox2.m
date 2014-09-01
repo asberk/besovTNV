@@ -7,7 +7,7 @@
 clear all; close all; clc;
 
 %% Read image
-A = imread('img/cows.jpg');
+A = imread('./../GraphSgmtn/img/cows.jpg');
 A = double(rgb2gray(A))./255;
 
 % set parameters and compute initial data

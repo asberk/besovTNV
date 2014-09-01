@@ -18,7 +18,7 @@ namestr = 'house.tiff';
 Xgray = double(X)/255; % convert to (0,1) scale.
 
 % wavelet type
-wname = 'db10';
+wname = 'db5';
 
 % parameters of noise
 noiseType = 0;
@@ -59,7 +59,7 @@ Lmult = length(mult);
 Cmat = zeros(Lmult+1, length(C));
 Cmat(1,:) = C; % == f
 
-figure; set(gcf, 'color', 'w');
+figure; set(gcf, 'Color', [1 1 1]);
 subplot(1, Lmult+1, 1);
 imshow(Xgray);
 title(['$f ', noiseVar, '$'], 'Interpreter', 'latex', 'FontSize', 16);
@@ -82,14 +82,16 @@ nc = 2; nr = 3; % number column, rows, resp. (when plotting results)
 Ndecomp = nc*nr-1; % number of decompositions to perform
 Cmat = zeros(Ndecomp+1, length(C)); % store wavelet coefficients of u
 Cmat(1, :) = C; % == f
-Cmat(2,:) = besovROF(Cmat(1,:), 1./lambda);
+Cmat(2,:) = besovROF(Cmat(1,:), lambda);
 
 v = Cmat(1,:);
 for j = 2:Ndecomp
     lambda = 2*lambda;
     v = v - Cmat(j,:);
-    Cmat(j+1,:) = besovROF(v, 1./lambda);
+    Cmat(j+1,:) = besovROF(v, lambda);
 end
+
+Uj = cumsum(Cmat(2:end,:));
 
 figure;
 set(gcf, 'color','w');
@@ -110,6 +112,15 @@ for j = 1:(Ndecomp+1)
     
 end
 
+figure; set(gcf, 'Color', [1 1 1]);
+for j = 1:Ndecomp
+    subplot(nc,nr, j);
+    imgj = waverec2(Uj(j,:), S, wname);
+    imshow(imgj);
+end
+subplot(nc, nr, nc*nr);
+imshow(waverec2(Cmat(1,:), S, wname));
+
 %% Visualize residual component
 figure;
 set(gcf, 'color', 'w');
@@ -117,3 +128,33 @@ vcmpt = waverec2(Cmat(1,:) - sum(Cmat(2:end,:)), S, 'haar');
 imshow(vcmpt+.3);
 title('Noise component, $v = f - (u_1 + u_2 + \ldots)$', ...
     'Interpreter', 'latex', 'FontSize', 16);
+
+
+%% Calculate m_n
+% and plot bounds on norm for U_n = \sum_j^n u_j
+lambda = mult2*mean(C); % make an arbitrary choice of lambda
+                  % for now, lambda < 1, so we invert to make large
+m = zeros(1,16);
+for n = -1:14
+    m(n+2) = sum(C > 1./((2.^n).*lambda));
+end
+un = Cmat(2:end, :);
+Un = cumsum(un);
+
+sqNormL2_un = sum(un.^2.').';
+sqNormL2_Un = sum(Un.^2.').';
+
+upperBound_un = m(2:6)./((2.^[0:4]).*lambda).^2;
+lowerBound_un = m(1:5)./((2.^[0:4]).*lambda).^2;
+
+hold on;
+plot(upperBound_un, 'r-');
+plot(sqNormL2_un);
+plot(lowerBound_un, 'r-');
+hold off;
+xlabel('$n$', 'FontSize', 20, 'Interpreter', 'latex');
+ylabel('$\|u_n\|_{L^2}^2$', 'FontSize', 20, 'Interpreter', 'latex');
+legendary = legend('$m_n/\lambda_n^2$', '$u_n$', '$m_{n-1}/\lambda_n^2$');
+set(legendary, 'Interpreter', 'latex', 'FontSize', 20)
+set(gcf, 'Color', [1 1 1]);
+
