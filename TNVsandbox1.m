@@ -13,12 +13,18 @@ clear all; close all; clc;
 
 % barbara image located at ./img/barbara.png
 % house image located at ./img/textures/1.4.05.tiff
-X = imread('../GraphSgmtn/img/textures/1.4.05.tiff');
-namestr = 'house.tiff';
+house = 0;
+if house
+    X = imread('../GraphSgmtn/img/textures/1.4.05.tiff');
+    namestr = 'house.tiff';
+else
+    X = imread('../GraphSgmtn/img/barbara.png');
+    namestr = 'barbara.png';
+end
 Xgray = double(X)/255; % convert to (0,1) scale.
 
 % wavelet type
-wname = 'db5';
+wname = 'db10';
 
 % parameters of noise
 noiseType = 0;
@@ -74,11 +80,11 @@ end
 
 %% Thresholding for TNV-type Multiscale Decomposition. 
 % Fix lambda.
-mult2 = 4;
+mult2 = 1;
 lambda = mult2*mean(C); % make an arbitrary choice of lambda
                   % for now, lambda < 1, so we invert to make large
                   
-nc = 2; nr = 3; % number column, rows, resp. (when plotting results)
+nc = 3; nr = 3; % number column, rows, resp. (when plotting results)
 Ndecomp = nc*nr-1; % number of decompositions to perform
 Cmat = zeros(Ndecomp+1, length(C)); % store wavelet coefficients of u
 Cmat(1, :) = C; % == f
